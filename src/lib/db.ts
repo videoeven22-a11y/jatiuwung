@@ -5,30 +5,27 @@ const globalForPrisma = globalThis as unknown as {
   dbInitialized: boolean
 }
 
-// Database path configuration for different platforms:
-// - Render: /app/data/smartwarga.db (persistent disk)
-// - Vercel/Cloudflare: /tmp/smartwarga.db (temporary, not persistent)
-// - Railway: uses default path
-// - Local: uses .env or default
+// Database configuration:
+// - Production (Vercel): Use DATABASE_URL from environment (PostgreSQL - Neon.tech)
+// - Local development: Use SQLite file
 const getDatabaseUrl = () => {
+  // Production: Use DATABASE_URL from environment (PostgreSQL)
   if (process.env.DATABASE_URL) {
     return process.env.DATABASE_URL
   }
   
-  // Check for Render's persistent disk
-  if (process.env.RENDER) {
-    return 'file:/app/data/smartwarga.db'
-  }
-  
-  // Default to /tmp for serverless environments
-  return 'file:/tmp/smartwarga.db'
+  // Local fallback: SQLite
+  return 'file:./dev.db'
 }
 
 // Create Prisma client
 const createPrismaClient = () => {
+  const dbUrl = getDatabaseUrl()
+  console.log('[DB] Using database:', dbUrl.includes('postgresql') ? 'PostgreSQL' : 'SQLite')
+  
   return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query'] : [],
-    datasourceUrl: getDatabaseUrl(),
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    datasourceUrl: dbUrl,
   })
 }
 
@@ -40,7 +37,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Initialize database with default data
-// This runs on first connection and ensures admin exists
 export async function initializeDatabase() {
   // Prevent multiple initializations
   if (globalForPrisma.dbInitialized) {
@@ -92,11 +88,4 @@ export async function initializeDatabase() {
     console.error('[DB] Initialization error:', error)
     // Don't throw, allow app to continue
   }
-}
-
-// Auto-initialize on first query (wrapper pattern)
-const originalFindFirst = db.adminUser.findFirst.bind(db.adminUser)
-db.adminUser.findFirst = async (...args: any[]) => {
-  await initializeDatabase()
-  return originalFindFirst(...args)
 }
