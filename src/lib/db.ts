@@ -6,22 +6,25 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 // Database configuration:
-// - Production (Vercel): Use DATABASE_URL from environment (PostgreSQL - Neon.tech)
-// - Local development: Use SQLite file
+// - Production (Vercel): Use DATABASE_URL from environment (PostgreSQL)
+// - Local development: Use SQLite if DATABASE_URL not set
 const getDatabaseUrl = () => {
-  // Production: Use DATABASE_URL from environment (PostgreSQL)
-  if (process.env.DATABASE_URL) {
-    return process.env.DATABASE_URL
+  const dbUrl = process.env.DATABASE_URL
+  
+  if (!dbUrl) {
+    // Development fallback - SQLite
+    console.log('[DB] No DATABASE_URL found, using local SQLite')
+    return 'file:./dev.db'
   }
   
-  // Local fallback: SQLite
-  return 'file:./dev.db'
+  return dbUrl
 }
 
 // Create Prisma client
 const createPrismaClient = () => {
   const dbUrl = getDatabaseUrl()
-  console.log('[DB] Using database:', dbUrl.includes('postgresql') ? 'PostgreSQL' : 'SQLite')
+  const isPostgres = dbUrl.includes('postgresql') || dbUrl.includes('postgres')
+  console.log('[DB] Using database:', isPostgres ? 'PostgreSQL' : 'SQLite')
   
   return new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
