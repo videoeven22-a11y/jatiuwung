@@ -389,19 +389,18 @@ export default function SmartWargaApp() {
         rtConfig={rtConfig}
       />
       
+      {/* AI Assistant - show for all users (public warga) */}
+      <AIAssistant rtConfig={rtConfig} />
+      
       {/* Admin-only modals */}
       {currentUser && (
-        <>
-          <ResidentFormModal 
-            isOpen={isResidentModalOpen} 
-            onClose={() => { setIsResidentModalOpen(false); setEditingResident(null); }} 
-            onSave={handleSaveResident} 
-            initialData={editingResident} 
-            isAdmin={true}
-          />
-          
-          <AIAssistant rtConfig={rtConfig} />
-        </>
+        <ResidentFormModal 
+          isOpen={isResidentModalOpen} 
+          onClose={() => { setIsResidentModalOpen(false); setEditingResident(null); }} 
+          onSave={handleSaveResident} 
+          initialData={editingResident} 
+          isAdmin={true}
+        />
       )}
       
       {/* PWA Install Prompt */}
