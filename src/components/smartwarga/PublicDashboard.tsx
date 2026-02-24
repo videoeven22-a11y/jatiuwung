@@ -62,7 +62,7 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-xl">
+      <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
             {rtConfig.appLogo ? (
@@ -73,25 +73,29 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
           </div>
           <div>
             <h1 className="text-2xl font-bold">{rtConfig.appName || 'SmartWarga RT'}</h1>
-            <p className="text-blue-100 text-sm">Sistem Informasi Warga Digital</p>
+            <p className="text-emerald-100 text-sm">Portal Layanan Warga</p>
           </div>
         </div>
         
+        <p className="text-emerald-50 text-sm mt-4">
+          Selamat datang di portal layanan digital RT. Silakan gunakan layanan kami untuk mengurus surat dan keperluan administrasi lainnya.
+        </p>
+        
         <div className="grid grid-cols-3 gap-3 mt-6">
           <div className="bg-white/10 rounded-xl p-3 text-center backdrop-blur-sm">
-            <Users className="w-6 h-6 mx-auto mb-1 text-blue-100" />
+            <Users className="w-6 h-6 mx-auto mb-1 text-emerald-100" />
             <div className="text-2xl font-bold">{totalWarga}</div>
-            <div className="text-xs text-blue-100">Total Warga</div>
+            <div className="text-xs text-emerald-100">Total Warga</div>
           </div>
           <div className="bg-white/10 rounded-xl p-3 text-center backdrop-blur-sm">
             <Heart className="w-6 h-6 mx-auto mb-1 text-green-200" />
             <div className="text-2xl font-bold">{wargaAktif}</div>
-            <div className="text-xs text-blue-100">Warga Aktif</div>
+            <div className="text-xs text-emerald-100">Warga Aktif</div>
           </div>
           <div className="bg-white/10 rounded-xl p-3 text-center backdrop-blur-sm">
             <FileText className="w-6 h-6 mx-auto mb-1 text-yellow-200" />
             <div className="text-2xl font-bold">{pengajuanSurat}</div>
-            <div className="text-xs text-blue-100">Pengajuan</div>
+            <div className="text-xs text-emerald-100">Pengajuan</div>
           </div>
         </div>
       </div>

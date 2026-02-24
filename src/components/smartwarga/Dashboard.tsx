@@ -185,9 +185,10 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h2 className="text-xl md:text-2xl font-bold text-slate-800">SmartWarga Dashboard</h2>
-        <p className="text-xs md:text-sm text-slate-500">Selamat datang di sistem layanan digital RT 03 Kp. Jati.</p>
+      {/* Admin Welcome */}
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white">
+        <h2 className="text-xl md:text-2xl font-bold">Dashboard Admin</h2>
+        <p className="text-slate-300 text-sm mt-1">Kelola data warga dan layanan RT dari panel ini.</p>
       </div>
 
       {/* Quick Actions for Public Users */}
