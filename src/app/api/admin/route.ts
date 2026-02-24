@@ -42,25 +42,29 @@ export async function POST(request: NextRequest) {
       console.log('[Login] Attempt for user:', body.username || '(empty)');
       
       // Cek jumlah admin di database
-      const adminCount = await db.adminUser.count();
+      let adminCount = await db.adminUser.count();
       
-      // Jika belum ada admin sama sekali, izinkan login tanpa kredensial
-      if (adminCount === 0 && !body.username && !body.password) {
-        console.log('[Login] No admin in DB, allowing default login');
-        return NextResponse.json({ 
-          success: true, 
-          data: {
-            id: 'default',
-            username: '',
-            name: 'Administrator',
-            role: 'Super Admin'
-          }
-        });
+      // Jika belum ada admin sama sekali, buat default admin
+      if (adminCount === 0) {
+        console.log('[Login] No admin found, creating default admin...');
+        try {
+          await db.adminUser.create({
+            data: {
+              username: 'admin',
+              password: 'admin123',
+              name: 'Pak RT',
+              role: 'Super Admin'
+            }
+          });
+          adminCount = 1;
+          console.log('[Login] Default admin created: admin/admin123');
+        } catch (e) {
+          console.log('[Login] Could not create default admin, might already exist');
+        }
       }
       
-      // Jika username dan password kosong, tapi ada admin di DB - cek apakah masih pakai default
-      if (adminCount > 0 && !body.username && !body.password) {
-        // Cek apakah ada admin dengan username 'admin' dan password 'admin123' (default)
+      // Jika username dan password kosong, cari default admin (admin/admin123)
+      if (!body.username && !body.password) {
         const defaultAdmin = await db.adminUser.findFirst({
           where: {
             username: 'admin',
@@ -70,6 +74,7 @@ export async function POST(request: NextRequest) {
         
         if (defaultAdmin) {
           // Masih pakai default, izinkan login kosong
+          console.log('[Login] Success with default admin (empty credentials)');
           return NextResponse.json({ 
             success: true, 
             data: {
@@ -81,18 +86,10 @@ export async function POST(request: NextRequest) {
           });
         }
         
-        // Sudah ada admin custom, harus isi username/password
+        // Tidak ada default admin, harus isi username/password
         return NextResponse.json({ 
           success: false, 
           error: 'Username dan password harus diisi. Admin sudah dikonfigurasi.' 
-        }, { status: 401 });
-      }
-      
-      // Jika sudah ada admin, wajib username dan password
-      if (adminCount > 0 && (!body.username || !body.password)) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Username dan password harus diisi' 
         }, { status: 401 });
       }
       
