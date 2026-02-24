@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, FileText, Bell, Phone, MapPin, Clock, 
   Shield, ChevronRight, MessageCircle, Calendar,
-  Building2, Heart, Award, Megaphone, Link2
+  Building2, Heart, Award, Megaphone, Link2, X
 } from 'lucide-react';
 import { Resident, ServiceRequest, RTConfig, Information } from '@/lib/types';
 
@@ -13,11 +13,13 @@ interface PublicDashboardProps {
   residents: Resident[];
   requests: ServiceRequest[];
   onLoginClick: () => void;
+  onOpenService?: (type?: string) => void;
 }
 
-export default function PublicDashboard({ rtConfig, residents, requests, onLoginClick }: PublicDashboardProps) {
+export default function PublicDashboard({ rtConfig, residents, requests, onLoginClick, onOpenService }: PublicDashboardProps) {
   const [informations, setInformations] = useState<Information[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLayananOpen, setIsLayananOpen] = useState(false);
 
   useEffect(() => {
     const fetchInformations = async () => {
@@ -52,12 +54,12 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
 
   // Available services
   const layanan = [
-    { name: 'Surat Keterangan Domisili', icon: FileText, color: 'bg-blue-500' },
-    { name: 'Surat Keterangan Tidak Mampu', icon: Heart, color: 'bg-rose-500' },
-    { name: 'Surat Keterangan Usaha', icon: Building2, color: 'bg-emerald-500' },
-    { name: 'Surat Keterangan Kematian', icon: Award, color: 'bg-purple-500' },
-    { name: 'Surat Pengantar KTP/KK', icon: Users, color: 'bg-orange-500' },
-    { name: 'Surat Keterangan Lainnya', icon: FileText, color: 'bg-slate-500' },
+    { id: 'domisili', name: 'Surat Keterangan Domisili', icon: FileText, color: 'bg-blue-500', desc: 'Keterangan tempat tinggal' },
+    { id: 'sktm', name: 'Surat Keterangan Tidak Mampu', icon: Heart, color: 'bg-rose-500', desc: 'Untuk bantuan sosial' },
+    { id: 'usaha', name: 'Surat Keterangan Usaha', icon: Building2, color: 'bg-emerald-500', desc: 'Keterangan memiliki usaha' },
+    { id: 'kematian', name: 'Surat Keterangan Kematian', icon: Award, color: 'bg-purple-500', desc: 'Surat kematian warga' },
+    { id: 'ktpkk', name: 'Surat Pengantar KTP/KK', icon: Users, color: 'bg-orange-500', desc: 'Pengantar pembuatan KTP/KK' },
+    { id: 'lainnya', name: 'Surat Keterangan Lainnya', icon: FileText, color: 'bg-slate-500', desc: 'Keperluan lainnya' },
   ];
 
   // Render info item
@@ -83,6 +85,13 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
       );
     }
     return <div key={item.id}>{content}</div>;
+  };
+
+  const handleLayananClick = (layananId: string) => {
+    setIsLayananOpen(false);
+    if (onOpenService) {
+      onOpenService(layananId);
+    }
   };
 
   return (
@@ -125,6 +134,25 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
           </div>
         </div>
       </div>
+
+      {/* Tombol Layanan Administrasi - Prominent */}
+      <button
+        onClick={() => setIsLayananOpen(true)}
+        className="w-full p-6 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl text-white shadow-xl hover:shadow-2xl transition-all hover:scale-[1.01] active:scale-[0.99]"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+              <FileText className="w-8 h-8" />
+            </div>
+            <div className="text-left">
+              <h2 className="text-xl font-bold">Layanan Administrasi</h2>
+              <p className="text-blue-100 text-sm">Ajukan surat keterangan dan keperluan lainnya</p>
+            </div>
+          </div>
+          <ChevronRight className="w-8 h-8 text-white/60" />
+        </div>
+      </button>
 
       {/* Pengumuman Section - Always show */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
@@ -180,27 +208,6 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
               <p className="text-sm text-slate-400">Belum ada jadwal kegiatan</p>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Layanan Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-        <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-600" />
-          Layanan Administrasi
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {layanan.map((item, index) => (
-            <div 
-              key={index}
-              className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
-            >
-              <div className={`w-10 h-10 ${item.color} rounded-lg flex items-center justify-center`}>
-                <item.icon className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-sm font-medium text-slate-700">{item.name}</span>
-            </div>
-          ))}
         </div>
       </div>
 
@@ -279,6 +286,57 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
           Login admin tersedia di pojok kanan atas →
         </p>
       </div>
+
+      {/* Layanan Modal */}
+      {isLayananOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setIsLayananOpen(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-5 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Layanan Administrasi</h2>
+                    <p className="text-blue-100 text-sm">Pilih jenis surat yang diajukan</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsLayananOpen(false)}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            
+            {/* Content */}
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              <div className="space-y-2">
+                {layanan.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleLayananClick(item.id)}
+                    className="w-full flex items-center gap-4 p-4 bg-slate-50 rounded-xl hover:bg-blue-50 hover:border-blue-200 border border-transparent transition-all text-left group"
+                  >
+                    <div className={`w-12 h-12 ${item.color} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                      <item.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-slate-800">{item.name}</h3>
+                      <p className="text-xs text-slate-500">{item.desc}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

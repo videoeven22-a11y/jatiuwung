@@ -225,16 +225,18 @@ export default function SmartWargaApp() {
       const res = await fetch('/api/requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(req)
+        body: JSON.stringify({ ...req, currentUser: currentUser?.name || 'Warga' })
       });
       if (res.ok) {
         const result = await res.json();
         if (result.success) {
           setRequests(prev => [result.data, ...prev]);
+          alert('Pengajuan surat berhasil dikirim! Silakan tunggu verifikasi dari RT.');
         }
       }
     } catch (error) {
       console.error('Error submitting request:', error);
+      alert('Terjadi kesalahan saat mengirim pengajuan.');
     }
   };
 
@@ -309,6 +311,7 @@ export default function SmartWargaApp() {
               residents={residents}
               requests={requests}
               onLoginClick={() => setActiveTab('login')}
+              onOpenService={() => setIsServiceModalOpen(true)}
             />
           ) : (
             <>
@@ -378,16 +381,17 @@ export default function SmartWargaApp() {
         )}
       </div>
 
-      {/* Modals - only show when logged in */}
+      {/* Modals - show for both logged in and public users */}
+      <ServiceRequestModal 
+        isOpen={isServiceModalOpen} 
+        onClose={() => setIsServiceModalOpen(false)} 
+        onSubmit={handleSubmitRequest} 
+        rtConfig={rtConfig}
+      />
+      
+      {/* Admin-only modals */}
       {currentUser && (
         <>
-          <ServiceRequestModal 
-            isOpen={isServiceModalOpen} 
-            onClose={() => setIsServiceModalOpen(false)} 
-            onSubmit={handleSubmitRequest} 
-            rtConfig={rtConfig}
-          />
-          
           <ResidentFormModal 
             isOpen={isResidentModalOpen} 
             onClose={() => { setIsResidentModalOpen(false); setEditingResident(null); }} 
