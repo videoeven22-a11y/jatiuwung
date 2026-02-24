@@ -46,6 +46,21 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: 'admin', label: 'Pengaturan', icon: ShieldCheck },
   ];
 
+  const handleMenuClick = (tab: string) => {
+    setActiveTab(tab);
+    onClose();
+  };
+
+  const handleOpenService = () => {
+    onOpenService();
+    onClose();
+  };
+
+  const handleOpenRegister = () => {
+    onOpenRegister();
+    onClose();
+  };
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -58,7 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-30 w-[320px] bg-white border-r border-slate-200 shadow-2xl transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 z-50 h-full w-[320px] bg-white border-r border-slate-200 shadow-2xl transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
@@ -88,7 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
                   ${isActive 
                     ? 'bg-blue-50 text-blue-600' 
@@ -106,7 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           <button
-            onClick={onOpenService}
+            onClick={handleOpenService}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-600 hover:bg-emerald-50 transition-all"
           >
             <PlusCircle size={20} />
@@ -114,7 +129,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
 
           <button
-            onClick={onOpenRegister}
+            onClick={handleOpenRegister}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-blue-600 hover:bg-blue-50 transition-all"
           >
             <UserPlus size={20} />
@@ -129,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
               {userRole === 'Super Admin' && (
                 <button
-                  onClick={() => setActiveTab('audit')}
+                  onClick={() => handleMenuClick('audit')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
                     ${activeTab === 'audit' 
                       ? 'bg-purple-50 text-purple-600' 
@@ -142,7 +157,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
 
               <button
-                onClick={onLogout}
+                onClick={() => { onLogout(); onClose(); }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all"
               >
                 <LogOut size={20} />
