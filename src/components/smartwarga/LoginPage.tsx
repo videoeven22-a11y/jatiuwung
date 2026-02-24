@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Shield, User, Loader2, ArrowRight, AlertCircle, Lock } from 'lucide-react';
+import { Shield, User, Loader2, ArrowRight, AlertCircle, Lock, LogIn } from 'lucide-react';
 import { RTConfig } from '@/lib/types';
 
 interface LoginPageProps {
@@ -30,71 +30,61 @@ const LoginPage: React.FC<LoginPageProps> = ({ rtConfig, onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 w-full">
-      {/* Background Decor */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-100 rounded-full blur-[120px] opacity-30"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-emerald-50 rounded-full blur-[120px] opacity-30"></div>
-      </div>
-
-      <div className="w-full max-w-[420px] space-y-8 animate-in fade-in zoom-in duration-500">
+    <div className="min-h-[70vh] flex flex-col items-center justify-center p-4 md:p-6 w-full">
+      <div className="w-full max-w-[420px] space-y-6">
+        {/* Logo dan Judul */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-[32px] shadow-2xl shadow-blue-100 mb-2 overflow-hidden border-4 border-white transform transition-transform hover:scale-105">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-2xl shadow-xl mb-2">
             {rtConfig.appLogo ? (
               <img 
                 src={rtConfig.appLogo} 
                 alt="Logo" 
-                className="w-14 h-14 object-contain" 
+                className="w-12 h-12 object-contain" 
               />
             ) : (
-              <Shield className="w-14 h-14 text-blue-600" />
+              <Shield className="w-12 h-12 text-white" />
             )}
           </div>
           <div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight">{rtConfig.appName || 'SmartWarga'}</h1>
-            <p className="text-slate-500 font-medium text-sm mt-1">Login Admin</p>
+            <h1 className="text-2xl font-bold text-slate-800">{rtConfig.appName || 'SmartWarga'}</h1>
+            <p className="text-slate-500 text-sm mt-1">Login Admin</p>
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[40px] shadow-2xl shadow-slate-200/50 border border-white/50 backdrop-blur-sm relative">
-          <div className="absolute top-0 right-0 p-6 opacity-[0.03]">
-             <Shield size={120} />
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-6 relative z-10">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Username</label>
-                <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Kosongkan jika belum ada admin"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:bg-white outline-none transition-all"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
+        {/* Form Login */}
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-500 uppercase">Username</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  type="text" 
+                  placeholder="Kosongkan jika belum ada admin"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Password</label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
-                  <input 
-                    type="password" 
-                    placeholder="Kosongkan jika belum ada admin"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:bg-white outline-none transition-all"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-500 uppercase">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  type="password" 
+                  placeholder="Kosongkan jika belum ada admin"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-[11px] text-red-600 font-bold flex items-center space-x-3">
-                <AlertCircle size={16} />
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-medium flex items-center gap-2">
+                <AlertCircle size={14} />
                 <span>{error}</span>
               </div>
             )}
@@ -102,33 +92,30 @@ const LoginPage: React.FC<LoginPageProps> = ({ rtConfig, onLogin }) => {
             <button 
               type="submit"
               disabled={isLoading}
-              className="w-full py-4.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-200 transition-all flex items-center justify-center space-x-3 active:scale-[0.98] disabled:opacity-70 group"
+              className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70"
             >
               {isLoading ? (
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  <span className="text-sm">MASUK</span>
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  <LogIn size={18} />
+                  <span>MASUK</span>
                 </>
               )}
             </button>
           </form>
         </div>
 
-        <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+        {/* Info */}
+        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
           <div className="flex items-start gap-3">
             <AlertCircle size={18} className="text-blue-500 mt-0.5 shrink-0" />
-            <div>
-              <p className="text-xs font-bold text-blue-700">Cara Login:</p>
-              <p className="text-xs text-blue-600 mt-1"><strong>Belum ada admin:</strong> Kosongkan username & password, langsung klik MASUK</p>
-              <p className="text-xs text-blue-600 mt-1"><strong>Sudah ada admin:</strong> Gunakan username & password yang sudah didaftarkan</p>
+            <div className="text-xs text-blue-700">
+              <p className="font-bold">Cara Login:</p>
+              <p className="mt-1"><strong>Belum ada admin:</strong> Kosongkan semua field, klik MASUK</p>
+              <p className="mt-1"><strong>Sudah ada admin:</strong> Isi username & password yang terdaftar</p>
             </div>
           </div>
-        </div>
-
-        <div className="text-center pt-4">
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em]">SmartWarga RT 03 Kp. Jati • Digitalized v2.4.1</p>
         </div>
       </div>
     </div>
