@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, FileText, Bell, Phone, MapPin, Clock, 
   Shield, ChevronRight, MessageCircle, Calendar,
-  Building2, Heart, Award, Megaphone
+  Building2, Heart, Award, Megaphone, Link2
 } from 'lucide-react';
 import { Resident, ServiceRequest, RTConfig, Information } from '@/lib/types';
 
@@ -41,12 +41,13 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
 
   // Calculate statistics
   const totalWarga = residents.length;
-  const wargaAktif = residents.filter(r => r.status === 'AKTIF').length;
+  const wargaAktif = residents.filter(r => r.status === 'AKTIF' || !r.status).length;
   const pengajuanSurat = requests.filter(r => r.status === 'Menunggu Verifikasi').length;
   
-  // Get pengumuman
-  const pengumuman = informations.filter(i => i.category === 'pengumuman' && i.isActive).slice(0, 3);
-  const jadwal = informations.filter(i => i.category === 'jadwal' && i.isActive).slice(0, 3);
+  // Get information by category
+  const infoPemerintah = informations.filter(i => i.category === 'pemerintah' && i.isActive).slice(0, 5);
+  const pengumuman = informations.filter(i => i.category === 'pengumuman' && i.isActive).slice(0, 5);
+  const jadwal = informations.filter(i => i.category === 'jadwal' && i.isActive).slice(0, 5);
   const links = informations.filter(i => i.category === 'link' && i.isActive);
 
   // Available services
@@ -58,6 +59,31 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
     { name: 'Surat Pengantar KTP/KK', icon: Users, color: 'bg-orange-500' },
     { name: 'Surat Keterangan Lainnya', icon: FileText, color: 'bg-slate-500' },
   ];
+
+  // Render info item
+  const renderInfoItem = (item: Information) => {
+    const content = (
+      <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shrink-0 shadow-sm">
+          {item.link ? <Link2 size={14} className="text-blue-500" /> : <FileText size={14} className="text-slate-500" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-slate-800 text-sm">{item.title}</h3>
+          <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{item.content}</p>
+        </div>
+        {item.link && <ChevronRight size={16} className="text-slate-400 shrink-0" />}
+      </div>
+    );
+
+    if (item.link) {
+      return (
+        <a key={item.id} href={item.link} target="_blank" rel="noopener noreferrer" className="block">
+          {content}
+        </a>
+      );
+    }
+    return <div key={item.id}>{content}</div>;
+  };
 
   return (
     <div className="space-y-6">
@@ -100,23 +126,62 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
         </div>
       </div>
 
-      {/* Pengumuman Section */}
-      {pengumuman.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Megaphone className="w-5 h-5 text-amber-600" />
-            <h2 className="font-semibold text-amber-800">Pengumuman</h2>
-          </div>
-          <div className="space-y-2">
-            {pengumuman.map((item, index) => (
-              <div key={item.id || index} className="bg-white rounded-lg p-3 shadow-sm">
-                <h3 className="font-medium text-slate-800">{item.title}</h3>
-                <p className="text-sm text-slate-600 mt-1">{item.content}</p>
-              </div>
-            ))}
-          </div>
+      {/* Pengumuman Section - Always show */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Megaphone className="w-5 h-5 text-amber-600" />
+          <h2 className="font-semibold text-amber-800">Pengumuman</h2>
         </div>
-      )}
+        {pengumuman.length > 0 ? (
+          <div className="space-y-2">
+            {pengumuman.map(renderInfoItem)}
+          </div>
+        ) : (
+          <div className="text-center py-6 bg-white rounded-xl">
+            <Megaphone className="w-8 h-8 text-amber-300 mx-auto mb-2" />
+            <p className="text-sm text-slate-400">Belum ada pengumuman</p>
+          </div>
+        )}
+      </div>
+
+      {/* Info Pemerintah & Jadwal - Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Info Pemerintah */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Building2 className="w-5 h-5 text-emerald-600" />
+            <h2 className="font-semibold text-slate-800">Info Pemerintah</h2>
+          </div>
+          {infoPemerintah.length > 0 ? (
+            <div className="space-y-2">
+              {infoPemerintah.map(renderInfoItem)}
+            </div>
+          ) : (
+            <div className="text-center py-6 bg-slate-50 rounded-xl">
+              <Building2 className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-400">Belum ada info pemerintah</p>
+            </div>
+          )}
+        </div>
+
+        {/* Jadwal Kegiatan */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar className="w-5 h-5 text-violet-600" />
+            <h2 className="font-semibold text-slate-800">Jadwal Kegiatan</h2>
+          </div>
+          {jadwal.length > 0 ? (
+            <div className="space-y-2">
+              {jadwal.map(renderInfoItem)}
+            </div>
+          ) : (
+            <div className="text-center py-6 bg-slate-50 rounded-xl">
+              <Calendar className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-400">Belum ada jadwal kegiatan</p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Layanan Section */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
@@ -139,52 +204,23 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
         </div>
       </div>
 
-      {/* Jadwal Section */}
-      {jadwal.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-          <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-green-600" />
-            Jadwal Kegiatan
-          </h2>
-          <div className="space-y-2">
-            {jadwal.map((item, index) => (
-              <div key={item.id || index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-slate-800">{item.title}</h3>
-                  <p className="text-sm text-slate-600">{item.content}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Link Penting */}
-      {links.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-          <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            <ChevronRight className="w-5 h-5 text-blue-600" />
-            Link Penting
-          </h2>
+      {/* Link Penting - Always show */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <Link2 className="w-5 h-5 text-blue-600" />
+          Link Penting
+        </h2>
+        {links.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {links.map((item, index) => (
-              <a
-                key={item.id || index}
-                href={item.link || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-              >
-                <ChevronRight className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700">{item.title}</span>
-              </a>
-            ))}
+            {links.map(renderInfoItem)}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="text-center py-6 bg-slate-50 rounded-xl">
+            <Link2 className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+            <p className="text-sm text-slate-400">Belum ada link penting</p>
+          </div>
+        )}
+      </div>
 
       {/* Kontak RT */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
