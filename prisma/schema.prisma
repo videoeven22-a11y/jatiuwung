@@ -1,13 +1,13 @@
 // SmartWarga RT 05 - Prisma Schema
+// Untuk Vercel deployment, ganti provider ke "postgresql"
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // Status Warga
