@@ -18,7 +18,7 @@ import InstallPrompt from '@/components/smartwarga/InstallPrompt';
 import { AdminUser, Resident, ServiceRequest, RTConfig, AuditLog as AuditLogType, AdminRole } from '@/lib/types';
 import { DEFAULT_RT_CONFIG } from '@/lib/constants';
 
-type TabType = 'dashboard' | 'warga' | 'surat' | 'admin' | 'audit';
+type TabType = 'dashboard' | 'warga' | 'surat' | 'admin' | 'audit' | 'login';
 
 export default function SmartWargaApp() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -290,17 +290,12 @@ export default function SmartWargaApp() {
         <Header 
           user={currentUser} 
           onMenuClick={() => setIsSidebarOpen(true)} 
-          onAdminClick={() => {
-            // If already logged in, go to admin tab. If not, the login page will show.
-            if (currentUser) {
-              setActiveTab('admin');
-            }
-          }}
+          onAdminClick={() => setActiveTab('login')}
         />
         
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 space-y-6">
-          {!currentUser ? (
+          {(!currentUser || activeTab === 'login') ? (
             <LoginPage 
               rtConfig={rtConfig}
               onLogin={handleLogin}

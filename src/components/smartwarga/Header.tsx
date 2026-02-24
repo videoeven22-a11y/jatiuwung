@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Bell, User, Menu, ShieldCheck } from 'lucide-react';
+import { Bell, User, Menu, ShieldCheck, LogIn } from 'lucide-react';
 import { AdminUser } from '@/lib/types';
 
 interface HeaderProps {
@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ user, onMenuClick, onAdminClick }) => {
       <div className="flex items-center space-x-4 flex-1">
         <button 
           onClick={onMenuClick}
-          className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
         >
           <Menu size={20} />
         </button>
@@ -39,11 +39,10 @@ const Header: React.FC<HeaderProps> = ({ user, onMenuClick, onAdminClick }) => {
         ) : (
           <button 
             onClick={onAdminClick}
-            className="flex items-center space-x-2 px-4 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all text-xs font-bold"
+            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all text-xs font-bold shadow-lg shadow-blue-200"
           >
-            <ShieldCheck size={16} />
-            <span className="hidden sm:inline">Masuk Admin</span>
-            <span className="sm:hidden">Login</span>
+            <LogIn size={16} />
+            <span>Login Admin</span>
           </button>
         )}
       </div>
