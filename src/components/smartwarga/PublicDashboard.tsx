@@ -234,14 +234,10 @@ export default function PublicDashboard({ rtConfig, residents, requests, onLogin
       </div>
 
       {/* Admin Login Button - Subtle */}
-      <div className="text-center pt-4">
-        <button
-          onClick={onLoginClick}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-        >
-          <Shield className="w-4 h-4" />
-          <span>Login Admin</span>
-        </button>
+      <div className="text-center pt-2 pb-4">
+        <p className="text-sm text-slate-400">
+          Login admin tersedia di pojok kanan atas →
+        </p>
       </div>
     </div>
   );

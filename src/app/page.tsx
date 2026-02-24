@@ -292,6 +292,7 @@ export default function SmartWargaApp() {
           user={currentUser} 
           onMenuClick={() => setIsSidebarOpen(true)} 
           onAdminClick={() => setActiveTab('login')}
+          rtConfig={rtConfig}
         />
         
         {/* Main Content Area */}
