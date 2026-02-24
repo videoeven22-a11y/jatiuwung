@@ -153,6 +153,20 @@ export interface RTConfig {
   updatedAt?: Date;
 }
 
+export interface Information {
+  id?: string;
+  category: string; // pemerintah, jadwal, pengumuman, link
+  title: string;
+  content: string;
+  link?: string;
+  icon?: string;
+  color?: string;
+  order?: number;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 // API Response Types
 export interface ApiResponse<T = unknown> {
   success: boolean;

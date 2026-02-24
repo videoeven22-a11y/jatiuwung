@@ -2,7 +2,6 @@
 
 // SmartWarga RT 03 - Main Application
 import React, { useState, useEffect } from 'react';
-import { LogIn, Shield } from 'lucide-react';
 import Sidebar from '@/components/smartwarga/Sidebar';
 import Header from '@/components/smartwarga/Header';
 import Dashboard from '@/components/smartwarga/Dashboard';
@@ -14,6 +13,7 @@ import BottomNav from '@/components/smartwarga/BottomNav';
 import ServiceRequestModal from '@/components/smartwarga/ServiceRequestModal';
 import ResidentFormModal from '@/components/smartwarga/ResidentFormModal';
 import LoginPage from '@/components/smartwarga/LoginPage';
+import PublicDashboard from '@/components/smartwarga/PublicDashboard';
 import AIAssistant from '@/components/smartwarga/AIAssistant';
 import InstallPrompt from '@/components/smartwarga/InstallPrompt';
 import { AdminUser, Resident, ServiceRequest, RTConfig, AuditLog as AuditLogType, AdminRole } from '@/lib/types';
@@ -302,25 +302,13 @@ export default function SmartWargaApp() {
               onLogin={handleLogin}
             />
           ) : !currentUser ? (
-            // Dashboard publik untuk user yang belum login
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-              <div className="w-24 h-24 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl">
-                {rtConfig.appLogo ? (
-                  <img src={rtConfig.appLogo} alt="Logo" className="w-14 h-14 object-contain" />
-                ) : (
-                  <Shield className="w-14 h-14 text-white" />
-                )}
-              </div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-2">{rtConfig.appName || 'SmartWarga'}</h1>
-              <p className="text-slate-500 mb-8">Silakan login untuk mengakses fitur admin</p>
-              <button 
-                onClick={() => setActiveTab('login')}
-                className="flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all text-lg font-bold shadow-lg"
-              >
-                <LogIn size={22} />
-                <span>Login Admin</span>
-              </button>
-            </div>
+            // Dashboard publik untuk pengunjung/warga
+            <PublicDashboard 
+              rtConfig={rtConfig}
+              residents={residents}
+              requests={requests}
+              onLoginClick={() => setActiveTab('login')}
+            />
           ) : (
             <>
               {activeTab === 'dashboard' && (
