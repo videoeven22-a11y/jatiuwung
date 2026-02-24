@@ -58,6 +58,36 @@ export async function POST(request: NextRequest) {
         });
       }
       
+      // Jika username dan password kosong, tapi ada admin di DB - cek apakah masih pakai default
+      if (adminCount > 0 && !body.username && !body.password) {
+        // Cek apakah ada admin dengan username 'admin' dan password 'admin123' (default)
+        const defaultAdmin = await db.adminUser.findFirst({
+          where: {
+            username: 'admin',
+            password: 'admin123'
+          }
+        });
+        
+        if (defaultAdmin) {
+          // Masih pakai default, izinkan login kosong
+          return NextResponse.json({ 
+            success: true, 
+            data: {
+              id: defaultAdmin.id,
+              username: defaultAdmin.username,
+              name: defaultAdmin.name,
+              role: defaultAdmin.role
+            }
+          });
+        }
+        
+        // Sudah ada admin custom, harus isi username/password
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Username dan password harus diisi. Admin sudah dikonfigurasi.' 
+        }, { status: 401 });
+      }
+      
       // Jika sudah ada admin, wajib username dan password
       if (adminCount > 0 && (!body.username || !body.password)) {
         return NextResponse.json({ 
