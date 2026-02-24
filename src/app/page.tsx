@@ -266,34 +266,23 @@ export default function SmartWargaApp() {
     );
   }
 
-  // Show login page if not logged in
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen flex bg-slate-50">
-        <LoginPage 
-          rtConfig={rtConfig}
-          onLogin={handleLogin}
-        />
-        <InstallPrompt />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex bg-slate-50">
-      {/* Sidebar */}
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={(tab) => { setActiveTab(tab); setIsSidebarOpen(false); }} 
-        onOpenService={() => { setIsServiceModalOpen(true); setIsSidebarOpen(false); }}
-        onOpenRegister={() => setIsResidentModalOpen(true)}
-        userRole={currentUser?.role || null}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        onLogout={handleLogout}
-        isLoggedIn={!!currentUser}
-        rtConfig={rtConfig}
-      />
+      {/* Sidebar - only show when logged in */}
+      {currentUser && (
+        <Sidebar 
+          activeTab={activeTab} 
+          setActiveTab={(tab) => { setActiveTab(tab); setIsSidebarOpen(false); }} 
+          onOpenService={() => { setIsServiceModalOpen(true); setIsSidebarOpen(false); }}
+          onOpenRegister={() => setIsResidentModalOpen(true)}
+          userRole={currentUser.role}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          onLogout={handleLogout}
+          isLoggedIn={true}
+          rtConfig={rtConfig}
+        />
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -301,91 +290,110 @@ export default function SmartWargaApp() {
         <Header 
           user={currentUser} 
           onMenuClick={() => setIsSidebarOpen(true)} 
-          onAdminClick={() => setActiveTab('admin')}
+          onAdminClick={() => {
+            // If already logged in, go to admin tab. If not, the login page will show.
+            if (currentUser) {
+              setActiveTab('admin');
+            }
+          }}
         />
         
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 space-y-6">
-          {activeTab === 'dashboard' && (
-            <Dashboard 
-              residentsCount={residents.length} 
-              residents={residents}
-              requests={requests} 
-              onOpenRegister={() => setIsResidentModalOpen(true)}
-              isLoggedIn={!!currentUser}
-              onEditResident={(res) => { setEditingResident(res); setIsResidentModalOpen(true); }}
-              onDeleteResident={handleDeleteResident}
+          {!currentUser ? (
+            <LoginPage 
+              rtConfig={rtConfig}
+              onLogin={handleLogin}
             />
-          )}
+          ) : (
+            <>
+              {activeTab === 'dashboard' && (
+                <Dashboard 
+                  residentsCount={residents.length} 
+                  residents={residents}
+                  requests={requests} 
+                  onOpenRegister={() => setIsResidentModalOpen(true)}
+                  isLoggedIn={true}
+                  onEditResident={(res) => { setEditingResident(res); setIsResidentModalOpen(true); }}
+                  onDeleteResident={handleDeleteResident}
+                />
+              )}
+                  
+              {activeTab === 'warga' && (
+                <ResidentDatabase 
+                  residents={residents}
+                  onAddResident={() => setIsResidentModalOpen(true)} 
+                  onEditResident={(res) => { setEditingResident(res); setIsResidentModalOpen(true); }}
+                  onDeleteResident={handleDeleteResident}
+                  userRole={currentUser.role as AdminRole}
+                  currentUser={currentUser.name}
+                  onRefresh={refreshResidents}
+                />
+              )}
               
-          {activeTab === 'warga' && currentUser && (
-            <ResidentDatabase 
-              residents={residents}
-              onAddResident={() => setIsResidentModalOpen(true)} 
-              onEditResident={(res) => { setEditingResident(res); setIsResidentModalOpen(true); }}
-              onDeleteResident={handleDeleteResident}
-              userRole={currentUser.role as AdminRole}
-              currentUser={currentUser.name}
-              onRefresh={refreshResidents}
-            />
-          )}
-          
-          {activeTab === 'surat' && (
-            <LetterRequests 
-              requests={requests} 
-              onUpdateStatus={handleUpdateRequestStatus} 
-              isLoggedIn={!!currentUser} 
-              rtConfig={rtConfig} 
-            />
-          )}
-          
-          {activeTab === 'admin' && currentUser && (
-            <AdminManagement 
-              userRole={currentUser.role} 
-              onLogout={handleLogout} 
-              rtConfig={rtConfig} 
-              setRtConfig={handleUpdateConfig}
-              currentUser={currentUser}
-              residents={residents}
-              onEditResident={(res) => { setEditingResident(res); setIsResidentModalOpen(true); }}
-              onDeleteResident={handleDeleteResident}
-              onAdminAdded={checkAdminStatus}
-            />
-          )}
-          
-          {activeTab === 'audit' && currentUser && (
-            <AuditLog logs={auditLogs} />
+              {activeTab === 'surat' && (
+                <LetterRequests 
+                  requests={requests} 
+                  onUpdateStatus={handleUpdateRequestStatus} 
+                  isLoggedIn={true} 
+                  rtConfig={rtConfig} 
+                />
+              )}
+              
+              {activeTab === 'admin' && (
+                <AdminManagement 
+                  userRole={currentUser.role} 
+                  onLogout={handleLogout} 
+                  rtConfig={rtConfig} 
+                  setRtConfig={handleUpdateConfig}
+                  currentUser={currentUser}
+                  residents={residents}
+                  onEditResident={(res) => { setEditingResident(res); setIsResidentModalOpen(true); }}
+                  onDeleteResident={handleDeleteResident}
+                  onAdminAdded={checkAdminStatus}
+                />
+              )}
+              
+              {activeTab === 'audit' && (
+                <AuditLog logs={auditLogs} />
+              )}
+            </>
           )}
         </main>
 
-        {/* Bottom Navigation (Mobile) */}
-        <BottomNav 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          onOpenService={() => setIsServiceModalOpen(true)}
-          onOpenRegister={() => setIsResidentModalOpen(true)}
-          isLoggedIn={!!currentUser}
-        />
+        {/* Bottom Navigation (Mobile) - only show when logged in */}
+        {currentUser && (
+          <BottomNav 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            onOpenService={() => setIsServiceModalOpen(true)}
+            onOpenRegister={() => setIsResidentModalOpen(true)}
+            isLoggedIn={true}
+          />
+        )}
       </div>
 
-      {/* Modals */}
-      <ServiceRequestModal 
-        isOpen={isServiceModalOpen} 
-        onClose={() => setIsServiceModalOpen(false)} 
-        onSubmit={handleSubmitRequest} 
-        rtConfig={rtConfig}
-      />
-      
-      <ResidentFormModal 
-        isOpen={isResidentModalOpen} 
-        onClose={() => { setIsResidentModalOpen(false); setEditingResident(null); }} 
-        onSave={handleSaveResident} 
-        initialData={editingResident} 
-        isAdmin={!!currentUser}
-      />
-      
-      {/* AI Assistant */}
-      <AIAssistant rtConfig={rtConfig} />
+      {/* Modals - only show when logged in */}
+      {currentUser && (
+        <>
+          <ServiceRequestModal 
+            isOpen={isServiceModalOpen} 
+            onClose={() => setIsServiceModalOpen(false)} 
+            onSubmit={handleSubmitRequest} 
+            rtConfig={rtConfig}
+          />
+          
+          <ResidentFormModal 
+            isOpen={isResidentModalOpen} 
+            onClose={() => { setIsResidentModalOpen(false); setEditingResident(null); }} 
+            onSave={handleSaveResident} 
+            initialData={editingResident} 
+            isAdmin={true}
+          />
+          
+          <AIAssistant rtConfig={rtConfig} />
+        </>
+      )}
       
       {/* PWA Install Prompt */}
       <InstallPrompt />
